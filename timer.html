@@ -341,30 +341,6 @@ html,body{
 }
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
-.bgm-types{
-  display:flex;gap:clamp(6px,1vw,12px);
-  flex-wrap:wrap;
-  justify-content:center;
-}
-
-.bgm-btn{
-  padding:.4em 1em;
-  background:transparent;
-  border:1px solid rgba(212,170,106,.2);
-  color:rgba(212,170,106,.45);
-  font-family:var(--jp-sans);
-  font-size:clamp(9px,1vw,12px);
-  letter-spacing:.1em;
-  cursor:pointer;
-  border-radius:2px;
-  transition:all .25s;
-}
-.bgm-btn:hover{border-color:rgba(212,170,106,.5);color:rgba(212,170,106,.7)}
-.bgm-btn.active{
-  border-color:var(--gold);
-  color:var(--gold2);
-  background:rgba(212,170,106,.1);
-}
 
 .bgm-vol{
   display:flex;align-items:center;gap:clamp(6px,1vw,12px);
@@ -431,6 +407,41 @@ html,body{
   border-color:rgba(212,170,106,.5);
   color:var(--gold);
 }
+
+/* ファイル読み込み */
+.file-load-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  width:100%;
+}
+.file-load-label{
+  display:inline-block;
+  padding:.45em 1.5em;
+  border:1px dashed rgba(212,170,106,.4);
+  color:rgba(212,170,106,.6);
+  font-size:clamp(10px,1.1vw,13px);
+  letter-spacing:.1em;
+  cursor:pointer;
+  border-radius:2px;
+  transition:all .3s;
+  text-align:center;
+}
+.file-load-label:hover{
+  border-color:var(--gold);
+  color:var(--gold2);
+  background:rgba(212,170,106,.08);
+}
+.file-name{
+  font-size:clamp(9px,1vw,12px);
+  color:rgba(255,255,255,.3);
+  letter-spacing:.08em;
+}
+.file-name.loaded{
+  color:var(--gold2);
+}
+
 
 /* Corner branding */
 .corner{
@@ -514,30 +525,29 @@ html,body{
 
     <span class="hint">タイマーをクリックしてもスタート／ストップできます</span>
 
-    <!-- ── BGM コントロール ── -->
+    <!-- ── BGM : Break Free ── -->
     <div class="bgm-wrap">
       <div class="bgm-label">
         <span class="bgm-icon" id="bgmIcon">♪</span>
-        <span>BGM</span>
+        <span>BGM &nbsp;—&nbsp; Break Free</span>
       </div>
 
-      <div class="bgm-types">
-        <button class="bgm-btn active" onclick="setBgm('brown')" id="btnBrown">ブラウンノイズ</button>
-        <button class="bgm-btn" onclick="setBgm('white')" id="btnWhite">ホワイトノイズ</button>
-        <button class="bgm-btn" onclick="setBgm('zen')" id="btnZen">禅トーン</button>
-        <button class="bgm-btn" onclick="setBgm('crystal')" id="btnCrystal">クリスタル</button>
-      </div>
+      <label class="file-load-label" for="musicFile">
+        🎵 &nbsp;Break Free を読み込む
+      </label>
+      <input type="file" id="musicFile" accept="audio/*" onchange="loadMusicFile(this)" style="display:none">
+      <span class="file-name" id="fileName">ファイル未選択</span>
 
       <div class="bgm-vol">
         <span class="vol-icon">🔈</span>
-        <input type="range" id="volSlider" min="0" max="100" value="30"
+        <input type="range" id="volSlider" min="0" max="100" value="50"
                oninput="setVolume(this.value)" class="vol-slider">
         <span class="vol-icon">🔊</span>
       </div>
 
       <div class="bgm-toggle-wrap">
-        <button class="bgm-toggle" id="bgmToggle" onclick="toggleBgm()">
-          <span id="bgmToggleText">タイマーと連動してON</span>
+        <button class="bgm-toggle on" id="bgmToggle" onclick="toggleBgmLink()">
+          <span id="bgmToggleText">タイマーと連動 ON</span>
         </button>
         <button class="bgm-now" id="bgmNow" onclick="previewBgm()">
           <span id="bgmNowText">試聴</span>
@@ -675,171 +685,70 @@ function playBeep(){
   } catch(e){}
 }
 
-// ══════════ BGM ENGINE ══════════
-let audioCtx = null;
-let bgmNodes = [];
-let bgmGainNode = null;
-let bgmType = 'brown';
-let bgmVolume = 0.30;
-let bgmLinked = true;   // タイマー連動ON/OFF
+// ══════════ BGM : Break Free ══════════
+let musicAudio = null;
+let musicLoaded = false;
+let bgmLinked = true;
+let bgmVolume = 0.50;
 let bgmPreviewing = false;
 let bgmPlaying = false;
 
-function getAudioCtx(){
-  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
+function loadMusicFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(musicAudio){ musicAudio.pause(); musicAudio.src=''; }
+  musicAudio = new Audio(URL.createObjectURL(file));
+  musicAudio.loop = true;
+  musicAudio.volume = bgmVolume;
+  musicLoaded = true;
+  const nameEl = document.getElementById('fileName');
+  nameEl.textContent = '♪ ' + file.name;
+  nameEl.classList.add('loaded');
+  document.getElementById('bgmIcon').style.color = 'var(--gold2)';
+}
+
+function startBgm(){
+  if(!musicLoaded) return;
+  musicAudio.volume = bgmVolume;
+  musicAudio.play().catch(()=>{});
+  bgmPlaying = true;
+  document.getElementById('bgmIcon').style.color = 'var(--gold2)';
 }
 
 function stopBgm(){
-  bgmNodes.forEach(n=>{ try{ n.stop(); }catch(e){} });
-  bgmNodes = [];
-  if(bgmGainNode){ bgmGainNode.disconnect(); bgmGainNode = null; }
+  if(!musicAudio) return;
+  musicAudio.pause();
+  musicAudio.currentTime = 0;
   bgmPlaying = false;
+  bgmPreviewing = false;
   document.getElementById('bgmIcon').style.color = 'rgba(212,170,106,.6)';
   document.getElementById('bgmNowText').textContent = '試聴';
   document.getElementById('bgmNow').classList.remove('playing');
 }
 
-function startBgm(){
-  stopBgm();
-  const ctx = getAudioCtx();
-  bgmGainNode = ctx.createGain();
-  bgmGainNode.gain.value = bgmVolume * 0.5;
-  bgmGainNode.connect(ctx.destination);
-
-  if(bgmType === 'brown'){
-    // ブラウンノイズ（温かみのある低周波ノイズ）
-    const bufferSize = ctx.sampleRate * 4;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    let lastOut = 0;
-    for(let i=0;i<bufferSize;i++){
-      const white = Math.random()*2-1;
-      data[i] = (lastOut + 0.02*white) / 1.02;
-      lastOut = data[i];
-      data[i] *= 3.5;
-    }
-    const src = ctx.createBufferSource();
-    src.buffer = buffer;
-    src.loop = true;
-    const lpf = ctx.createBiquadFilter();
-    lpf.type = 'lowpass';
-    lpf.frequency.value = 300;
-    src.connect(lpf);
-    lpf.connect(bgmGainNode);
-    src.start();
-    bgmNodes.push(src);
-
-  } else if(bgmType === 'white'){
-    // ホワイトノイズ（集中用）
-    const bufferSize = ctx.sampleRate * 2;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for(let i=0;i<bufferSize;i++) data[i] = Math.random()*2-1;
-    const src = ctx.createBufferSource();
-    src.buffer = buffer;
-    src.loop = true;
-    const lpf = ctx.createBiquadFilter();
-    lpf.type = 'lowpass';
-    lpf.frequency.value = 3000;
-    src.connect(lpf);
-    lpf.connect(bgmGainNode);
-    src.start();
-    bgmNodes.push(src);
-
-  } else if(bgmType === 'zen'){
-    // 禅トーン（432Hz ドローン＋倍音）
-    const freqs = [108, 216, 324, 432, 540];
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = i===0 ? 'sine' : 'sine';
-      osc.frequency.value = f;
-      g.gain.value = i===0 ? 0.18 : 0.08 / (i+1);
-      // Slow tremolo
-      const lfo = ctx.createOscillator();
-      const lfoGain = ctx.createGain();
-      lfo.frequency.value = 0.07 + i*0.03;
-      lfoGain.gain.value = g.gain.value * 0.3;
-      lfo.connect(lfoGain);
-      lfoGain.connect(g.gain);
-      osc.connect(g);
-      g.connect(bgmGainNode);
-      lfo.start();
-      osc.start();
-      bgmNodes.push(osc, lfo);
-    });
-
-  } else if(bgmType === 'crystal'){
-    // クリスタルボウル風（高音倍音＋リバーブ感）
-    const baseFreqs = [528, 396, 639, 741];
-    baseFreqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = f;
-      g.gain.value = 0;
-      osc.connect(g);
-      g.connect(bgmGainNode);
-      osc.start();
-      // Slow fade in/out cycle
-      const cycle = 6 + i*2.5;
-      const attack = cycle * 0.4;
-      const release = cycle * 0.6;
-      function pulse(t){
-        g.gain.cancelScheduledValues(t);
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.06/(i+1), t + attack);
-        g.gain.linearRampToValueAtTime(0, t + cycle);
-        setTimeout(()=>pulse(ctx.currentTime), (cycle+1)*1000);
-      }
-      setTimeout(()=>pulse(ctx.currentTime), i * 1500);
-      bgmNodes.push(osc);
-    });
-  }
-
-  bgmPlaying = true;
-  document.getElementById('bgmIcon').style.color = 'var(--gold2)';
-}
-
-function setBgm(type){
-  bgmType = type;
-  ['brown','white','zen','crystal'].forEach(t=>{
-    document.getElementById('btn'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('active');
-  });
-  document.getElementById('btn'+type.charAt(0).toUpperCase()+type.slice(1)).classList.add('active');
-  if(bgmPlaying) startBgm(); // restart with new type
-}
-
 function setVolume(val){
   bgmVolume = val / 100;
-  if(bgmGainNode) bgmGainNode.gain.value = bgmVolume * 0.5;
-  // Update slider gradient
+  if(musicAudio) musicAudio.volume = bgmVolume;
   const slider = document.getElementById('volSlider');
-  slider.style.setProperty('--val', val+'%');
   slider.style.background = `linear-gradient(to right, var(--gold) ${val}%, rgba(255,255,255,.1) ${val}%)`;
 }
 
-function toggleBgm(){
+function toggleBgmLink(){
   bgmLinked = !bgmLinked;
   const btn = document.getElementById('bgmToggle');
   const txt = document.getElementById('bgmToggleText');
-  if(bgmLinked){
-    btn.classList.add('on');
-    txt.textContent = 'タイマーと連動してON';
-  } else {
-    btn.classList.remove('on');
-    txt.textContent = '連動OFF（手動）';
-  }
+  btn.classList.toggle('on', bgmLinked);
+  txt.textContent = bgmLinked ? 'タイマーと連動 ON' : '連動 OFF（手動）';
 }
 
 function previewBgm(){
-  if(bgmPreviewing || bgmPlaying){
+  if(bgmPlaying){
     stopBgm();
-    bgmPreviewing = false;
-    document.getElementById('bgmNowText').textContent = '試聴';
-    document.getElementById('bgmNow').classList.remove('playing');
   } else {
+    if(!musicLoaded){
+      alert('先に「Break Free を読み込む」からファイルを選択してください');
+      return;
+    }
     startBgm();
     bgmPreviewing = true;
     document.getElementById('bgmNowText').textContent = '停止';
@@ -847,35 +756,29 @@ function previewBgm(){
   }
 }
 
-// Init slider gradient
-setVolume(30);
-
-// ── Patch toggleTimer to control BGM ──
+// タイマーとBGMの連動
 const _origToggle = toggleTimer;
 toggleTimer = function(){
   _origToggle();
-  if(bgmLinked){
-    if(isRunning && !bgmPlaying){
-      bgmPreviewing = false;
-      startBgm();
-    } else if(!isRunning && bgmPlaying && !bgmPreviewing){
-      stopBgm();
-    }
-  }
+  if(!bgmLinked || !musicLoaded) return;
+  if(isRunning && !bgmPlaying){ bgmPreviewing=false; startBgm(); }
+  else if(!isRunning && bgmPlaying){ stopBgm(); }
 };
 
-// Patch resetTimer to stop BGM
 const _origReset = resetTimer;
 resetTimer = function(){
   _origReset();
-  if(bgmLinked && bgmPlaying && !bgmPreviewing) stopBgm();
+  if(bgmPlaying) stopBgm();
 };
 
-// Keyboard shortcuts
+// 初期スライダー描画
+setVolume(50);
+
+// キーボードショートカット
 document.addEventListener('keydown', e => {
-  if(e.code === 'Space'){ e.preventDefault(); toggleTimer(); }
-  if(e.code === 'KeyR'){ resetTimer(); }
-  if(e.code === 'KeyM'){ previewBgm(); }
+  if(e.code==='Space'){ e.preventDefault(); toggleTimer(); }
+  if(e.code==='KeyR'){ resetTimer(); }
+  if(e.code==='KeyM'){ previewBgm(); }
 });
 
 updateDisplay();
