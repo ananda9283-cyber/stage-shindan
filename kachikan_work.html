@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>価値観ワーク｜5Daysチャレンジ</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --gold:#D4AA6A;
+  --gold2:#EDD9A3;
+  --purple:#4A3060;
+  --purple2:#6B4E8A;
+  --white:#FFFFFF;
+  --serif:'Cormorant Garamond',serif;
+  --jp-serif:'Noto Serif JP',serif;
+  --jp-sans:'Noto Sans JP',sans-serif;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  min-height:100vh;
+  background:#1A0E2E;
+  font-family:var(--jp-sans);
+  color:var(--white);
+}
+
+/* Background */
+.bg-fixed{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 20% 20%, #3D2560 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 80% 80%, #2A1840 0%, transparent 55%),
+    linear-gradient(150deg, #1A0E2E 0%, #2E1A4A 50%, #1A0E2E 100%);
+}
+.grid{
+  position:fixed;inset:0;z-index:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 49px,rgba(212,170,106,.04) 49px,rgba(212,170,106,.04) 50px),
+    repeating-linear-gradient(90deg,transparent,transparent 49px,rgba(212,170,106,.04) 49px,rgba(212,170,106,.04) 50px);
+}
+
+/* Layout */
+.container{
+  position:relative;z-index:1;
+  max-width:720px;
+  margin:0 auto;
+  padding:60px 24px 80px;
+}
+
+/* Header */
+.header{
+  text-align:center;
+  margin-bottom:56px;
+}
+.header-label{
+  font-family:var(--serif);
+  font-size:12px;
+  letter-spacing:.5em;
+  color:rgba(212,170,106,.6);
+  border-top:1px solid rgba(212,170,106,.3);
+  border-bottom:1px solid rgba(212,170,106,.3);
+  padding:.6em 2em;
+  display:inline-block;
+  margin-bottom:24px;
+}
+.header-title{
+  font-family:var(--jp-serif);
+  font-weight:300;
+  font-size:clamp(24px,5vw,40px);
+  color:var(--white);
+  letter-spacing:.08em;
+  line-height:1.5;
+  margin-bottom:16px;
+}
+.header-sub{
+  font-size:14px;
+  color:rgba(255,255,255,.45);
+  letter-spacing:.1em;
+  line-height:1.8;
+}
+
+/* Divider */
+.divider{
+  display:flex;align-items:center;gap:16px;
+  margin:40px 0;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,rgba(212,170,106,.3));
+}
+.divider::after{background:linear-gradient(to left,transparent,rgba(212,170,106,.3))}
+.divider-icon{
+  font-family:var(--serif);
+  font-size:18px;
+  color:rgba(212,170,106,.5);
+}
+
+/* Step indicator */
+.step-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;
+  letter-spacing:.25em;
+  color:rgba(212,170,106,.6);
+  margin-bottom:20px;
+}
+.step-num{
+  width:22px;height:22px;
+  border:1px solid rgba(212,170,106,.4);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);
+  font-size:13px;
+  color:var(--gold2);
+}
+
+/* Section */
+.section{
+  margin-bottom:48px;
+}
+.section-title{
+  font-family:var(--jp-serif);
+  font-weight:300;
+  font-size:clamp(14px,2.5vw,18px);
+  color:var(--gold2);
+  letter-spacing:.08em;
+  margin-bottom:8px;
+}
+.section-hint{
+  font-size:12px;
+  color:rgba(255,255,255,.35);
+  letter-spacing:.08em;
+  margin-bottom:16px;
+  line-height:1.7;
+}
+
+/* Questions */
+.questions{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.q-item{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.q-label{
+  display:flex;align-items:flex-start;gap:12px;
+}
+.q-num{
+  font-family:var(--serif);
+  font-size:13px;
+  color:var(--gold);
+  min-width:24px;
+  padding-top:2px;
+  opacity:.8;
+}
+.q-text{
+  font-size:13px;
+  color:rgba(255,255,255,.7);
+  letter-spacing:.06em;
+  line-height:1.7;
+}
+
+textarea{
+  width:100%;
+  min-height:70px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(212,170,106,.2);
+  border-radius:3px;
+  color:var(--white);
+  font-family:var(--jp-sans);
+  font-size:13px;
+  letter-spacing:.05em;
+  line-height:1.7;
+  padding:12px 14px;
+  resize:vertical;
+  outline:none;
+  transition:border-color .3s;
+  caret-color:var(--gold);
+}
+textarea:focus{
+  border-color:rgba(212,170,106,.5);
+  background:rgba(255,255,255,.06);
+}
+textarea::placeholder{
+  color:rgba(255,255,255,.2);
+}
+
+/* Generate button */
+.btn-generate{
+  width:100%;
+  padding:18px;
+  background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold2);
+  font-family:var(--jp-sans);
+  font-size:14px;
+  letter-spacing:.2em;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+  margin-top:8px;
+}
+.btn-generate::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--purple2),var(--purple));
+  transform:translateY(100%);
+  transition:transform .3s;z-index:0;
+}
+.btn-generate:hover::before{transform:translateY(0)}
+.btn-generate span{position:relative;z-index:1}
+
+/* Result area */
+.result-area{
+  display:none;
+  margin-top:48px;
+}
+.result-area.show{display:block}
+
+.result-box{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(212,170,106,.25);
+  border-radius:4px;
+  padding:28px;
+  margin-bottom:20px;
+}
+.result-label{
+  font-family:var(--serif);
+  font-size:11px;
+  letter-spacing:.4em;
+  color:rgba(212,170,106,.6);
+  margin-bottom:16px;
+}
+.result-text{
+  font-size:12px;
+  color:rgba(255,255,255,.55);
+  line-height:1.9;
+  letter-spacing:.05em;
+  white-space:pre-wrap;
+  word-break:break-word;
+  max-height:360px;
+  overflow-y:auto;
+}
+.result-text::-webkit-scrollbar{width:4px}
+.result-text::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}
+.result-text::-webkit-scrollbar-thumb{background:rgba(212,170,106,.3);border-radius:2px}
+
+/* Copy button */
+.btn-copy{
+  width:100%;
+  padding:16px;
+  background:rgba(212,170,106,.1);
+  border:1px solid var(--gold);
+  color:var(--gold2);
+  font-family:var(--jp-sans);
+  font-size:13px;
+  letter-spacing:.2em;
+  cursor:pointer;
+  transition:all .3s;
+  border-radius:2px;
+}
+.btn-copy:hover{
+  background:rgba(212,170,106,.2);
+}
+.btn-copy.copied{
+  border-color:rgba(100,200,150,.6);
+  color:rgba(100,200,150,.9);
+  background:rgba(100,200,150,.08);
+}
+
+/* ChatGPT link button */
+.btn-chatgpt{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:18px;
+  background:rgba(16,163,127,.1);
+  border:1px solid rgba(16,163,127,.4);
+  color:rgba(16,163,127,.9);
+  font-family:var(--jp-sans);
+  font-size:13px;
+  letter-spacing:.15em;
+  cursor:pointer;
+  transition:all .3s;
+  text-decoration:none;
+  border-radius:2px;
+  margin-top:12px;
+}
+.btn-chatgpt:hover{
+  background:rgba(16,163,127,.18);
+  border-color:rgba(16,163,127,.6);
+}
+
+/* Steps guide */
+.steps-guide{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(212,170,106,.15);
+  border-radius:4px;
+  padding:24px;
+  margin-top:16px;
+}
+.steps-guide-title{
+  font-size:12px;
+  letter-spacing:.2em;
+  color:rgba(212,170,106,.6);
+  margin-bottom:16px;
+}
+.step-item{
+  display:flex;align-items:flex-start;gap:12px;
+  margin-bottom:12px;
+  font-size:12px;
+  color:rgba(255,255,255,.5);
+  letter-spacing:.06em;
+  line-height:1.7;
+}
+.step-item:last-child{margin-bottom:0}
+.step-circle{
+  min-width:22px;height:22px;
+  border-radius:50%;
+  background:rgba(212,170,106,.15);
+  border:1px solid rgba(212,170,106,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);
+  font-size:12px;
+  color:var(--gold2);
+  flex-shrink:0;
+}
+
+/* Corner branding */
+.corner{
+  position:fixed;
+  bottom:16px;right:20px;
+  font-family:var(--serif);
+  font-size:11px;
+  letter-spacing:.2em;
+  color:rgba(255,255,255,.12);
+  z-index:2;
+}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .5s ease forwards}
+</style>
+</head>
+<body>
+
+<div class="bg-fixed"></div>
+<div class="grid"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">Day 2 ｜ 5Days チャレンジ</div>
+    <h1 class="header-title">価値観ワーク</h1>
+    <p class="header-sub">
+      13の問いに答えてください<br>
+      あなただけの価値観・天才性・使命が言葉になります
+    </p>
+  </div>
+
+  <!-- Step 1: Input -->
+  <div class="step-badge">
+    <span class="step-num">1</span>
+    <span>13の問いに答える</span>
+  </div>
+
+  <div class="section">
+    <p class="section-hint">
+      深く考えすぎず、直感で思い浮かんだことをそのまま書いてください。<br>
+      正解はありません。「今の自分」を正直に。
+    </p>
+
+    <div class="questions">
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">①</span>
+          <span class="q-text">あなたの周りの空間を占めているもの（部屋・デスク・バッグの中など）</span>
+        </div>
+        <textarea id="q1" placeholder="例：ノート、本、ヨガマット、アロマ…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">②</span>
+          <span class="q-text">最も時間を使っているもの（仕事・プライベート含めて）</span>
+        </div>
+        <textarea id="q2" placeholder="例：レッスン準備、SNS発信、読書、子どもとの時間…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">③</span>
+          <span class="q-text">最もエネルギーが湧くもの</span>
+        </div>
+        <textarea id="q3" placeholder="例：人と話すとき、新しいことを学ぶとき、創ること…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">④</span>
+          <span class="q-text">最もお金を使っているもの</span>
+        </div>
+        <textarea id="q4" placeholder="例：研修費、本、体のケア、食事、道具…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑤</span>
+          <span class="q-text">最も整理整頓できているもの（物でも情報でも）</span>
+        </div>
+        <textarea id="q5" placeholder="例：レッスン記録、スケジュール、学んだことのメモ…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑥</span>
+          <span class="q-text">自律・集中してでき、人から信頼されること</span>
+        </div>
+        <textarea id="q6" placeholder="例：話を聞くこと、継続すること、わかりやすく伝えること…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑦</span>
+          <span class="q-text">普段よく考えていること</span>
+        </div>
+        <textarea id="q7" placeholder="例：生徒さんのこと、発信のこと、自分の将来…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑧</span>
+          <span class="q-text">行動している将来のビジョン（理想の未来）</span>
+        </div>
+        <textarea id="q8" placeholder="例：自分らしい講座で選ばれること、月商〇〇万円…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑨</span>
+          <span class="q-text">あなたのセルフトーク（自分によく言い聞かせる言葉）</span>
+        </div>
+        <textarea id="q9" placeholder="例：「焦らなくていい」「もっとできるはず」…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑩</span>
+          <span class="q-text">社交の場でよく話す話題</span>
+        </div>
+        <textarea id="q10" placeholder="例：健康のこと、ビジネスのこと、子育て…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑪</span>
+          <span class="q-text">最も心が動かされること（感動・怒り・悲しみ何でも）</span>
+        </div>
+        <textarea id="q11" placeholder="例：地道にがんばる人、思いやりのある行動…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑫</span>
+          <span class="q-text">長期的な目標（5年・10年先）</span>
+        </div>
+        <textarea id="q12" placeholder="例：自分のスタジオを持つ、〇〇な人を増やす…"></textarea>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">
+          <span class="q-num">⑬</span>
+          <span class="q-text">最も学びたいこと</span>
+        </div>
+        <textarea id="q13" placeholder="例：発信、ブランディング、AI活用、コーチング…"></textarea>
+      </div>
+
+    </div>
+
+    <div class="divider" style="margin-top:36px"><span class="divider-icon">✦</span></div>
+
+    <button class="btn-generate" onclick="generatePrompt()">
+      <span>✦ &nbsp; ChatGPT用プロンプトを生成する &nbsp; ✦</span>
+    </button>
+  </div>
+
+  <!-- Step 2: Result -->
+  <div class="result-area" id="resultArea">
+
+    <div class="step-badge fade-in">
+      <span class="step-num">2</span>
+      <span>プロンプトをChatGPTに貼り付ける</span>
+    </div>
+
+    <div class="result-box fade-in">
+      <div class="result-label">生成されたプロンプト</div>
+      <div class="result-text" id="promptText"></div>
+    </div>
+
+    <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">
+      📋 &nbsp; プロンプトをコピーする
+    </button>
+
+    <a class="btn-chatgpt" href="https://chat.openai.com/" target="_blank">
+      ↗ &nbsp; ChatGPTを開く
+    </a>
+
+    <div class="steps-guide fade-in">
+      <div class="steps-guide-title">NEXT STEP</div>
+      <div class="step-item">
+        <span class="step-circle">1</span>
+        <span>上の「プロンプトをコピーする」をタップ</span>
+      </div>
+      <div class="step-item">
+        <span class="step-circle">2</span>
+        <span>「ChatGPTを開く」からChatGPTを起動</span>
+      </div>
+      <div class="step-item">
+        <span class="step-circle">3</span>
+        <span>入力欄にペースト（Cmd+V / 長押し→ペースト）して送信</span>
+      </div>
+      <div class="step-item">
+        <span class="step-circle">4</span>
+        <span>出てきた分析結果を手元にメモ or スクリーンショット<br>→ Day2ワークの素材になります</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="corner">5Daysチャレンジ｜3rdway Academy</div>
+
+<script>
+function generatePrompt(){
+  const vals = [];
+  for(let i=1;i<=13;i++){
+    const el = document.getElementById('q'+i);
+    vals.push(el ? el.value.trim() : '');
+  }
+
+  const labels = [
+    '周りの空間を占めているもの',
+    '最も時間を使っているもの',
+    '最もエネルギーが湧くもの',
+    '最もお金を使っているもの',
+    '最も整理整頓できているもの',
+    '自律・集中でき信頼されること',
+    '普段よく考えていること',
+    '行動している将来のビジョン',
+    'セルフトーク',
+    '社交の場でよく話す話題',
+    '最も心が動かされること',
+    '長期的な目標',
+    '最も学びたいこと'
+  ];
+
+  let answers = '';
+  for(let i=0;i<13;i++){
+    const v = vals[i] || '（未入力）';
+    answers += `${'①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬'[i]}${labels[i]}：${v}\n`;
+  }
+
+  const prompt = `あなたは価値観分析の専門家です。
+以下の13問への回答を深く読み込み、
+この人だけの価値観・才能・ビジネスへの活かし方を分析してください。
+
+【重要なルール】
+・テンプレートや汎用的な表現を使わない
+・回答に実際に出てきた言葉・具体的な内容を必ず引用する
+・「一般的に〜」「多くの人が〜」という書き方をしない
+・他の人には使えない、完全にこの人だけの分析にする
+・職種・目標・状況に具体的に紐づけて書く
+
+【私の13問への回答】
+${answers}
+【出力形式】
+
+■ 最高の価値観
+（私の回答の言葉を使って、私だけの価値観を2〜3行で表現する）
+
+■ 天才性・強み（3つ）
+各強みのタイトルを書き、私の回答のどの部分からそう読み取れるかを
+具体的に引用しながら3〜5行で説明する
+
+■ ビジネスへの活かし方（3つのヒント）
+私の長期目標・学びたいこと・ビジョンに紐づけた
+具体的なアクションを1ヒントにつき3〜4行で書く`;
+
+  document.getElementById('promptText').textContent = prompt;
+  const area = document.getElementById('resultArea');
+  area.classList.add('show');
+  setTimeout(()=>{
+    area.scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
+
+function copyPrompt(){
+  const text = document.getElementById('promptText').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ コピーしました！';
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.textContent = '📋 　プロンプトをコピーする';
+      btn.classList.remove('copied');
+    }, 2500);
+  }).catch(()=>{
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ コピーしました！';
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.textContent = '📋 　プロンプトをコピーする';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+</script>
+</body>
+</html>
